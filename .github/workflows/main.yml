@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - stage
-    paths:
+    paths:  
       - terraform/**
   pull_request:
     branches:
@@ -19,7 +19,7 @@ env:
  # S3 bucket for the Terraform state
  BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE}}
  AWS_REGION: us-east-2
-
+ EKS_CLUSTER: vprofile-eks
 
 jobs:
    terraform:
@@ -31,20 +31,17 @@ jobs:
          working-directory: ./terraform
 
      steps:
-       - name: Checkout source code
+       - name: Checkout source code 
          uses: actions/checkout@v4
 
-       - name: Set up Terraform
+       - name: Setup Terraform with specified version on the runner
          uses: hashicorp/setup-terraform@v2
          with:
-          terraform_version: 1.6.3 
-         #with:
-         #  terraform_version: 1.6.3
+           terraform_version: 1.6.3
 
        - name: Terraform init
          id: init
-         run: terraform init -backend-config="bucket=$BUCKET_TF_STATE
-
+         run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
 
        - name: Terraform format
          id: fmt
@@ -60,5 +57,5 @@ jobs:
          continue-on-error: true
 
        - name: Terraform plan status
-         if: steps.plan.outcome == 'failure'
-         run: exit 1
+         if: steps.plan.outcome == 'failure' 
+         run: exit 1     
